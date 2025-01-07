@@ -1,0 +1,115 @@
+1.	select sname from sailors where sid in (select sid from reserves);
+2.	select sid from reserves where bid in (select bid from boats where colour in ("red","green"));
+3.	select sid from sailors where sid not in (select sid from reserves);
+
+alter table department
+add constraint fk_mgrssn
+foreign key(mgrssn) references emp(ssn);
+
+update department set mgrssn=1111 where dnumber=1 ;
+
+2.1 select fname,lname from emp where salary > (select salary from emp where dno=5);
+2.2 SELECT ESSN FROM WORKS_ON WHERE Pno IN (1, 2, 3);
+2.3 select pno,sum(hours) from works_on group by pno;
+
+6.1 select dname,avg(salary) as average_salary from department d 
+join emp e on d.dnumber=e.dno group by dname;
+6.2 select e.fname,e.lname from emp e where e.ssn in (select d.mgrssn from department d join dependent de on d.mgrssn=de.essn);
+6.3 select dname from department where dname like '%ing%';
+
+3.1 select emp_id,max(salary) from employee;
+3.2 SELECT Aircraft_name FROM AIRCRAFT WHERE Aircraft_ID NOT IN (SELECT Aircraft_ID  FROM CERTIFIED C JOIN EMPLOYEE E ON C.Emp_ID = E.Emp_ID WHERE E.Salary <= 50000);
+3.3 SELECT Emp_ID, Ename FROM EMPLOYEE WHERE Emp_ID NOT IN (SELECT Emp_ID FROM CERTIFIED);
+
+5.1 select e.ename from employee e join certified c on e.emp_id=c.emp_id join aircraft a on a.aircraft_id=c.aircraft_id where a.aircraft_name like "%Boeing%";
+5.2 select aircraft_name,cruising_range from aircraft order by cruising_range asc;
+5.3 select e.ename from employee e join certified c on e.emp_id=c.emp_id
+join aircraft a on a.aircraft_id=c.aircraft_id where a.cruising_range>=3000 and 
+a.aircraft_id not in (select aircraft_id from aircraft WHERE aircraft_name like "%Boeing%" );
+    
+
+4.1SELECT DISTINCT S.Sid
+FROM SUPPLIER S
+JOIN SHIPMENT SH ON S.Sid = SH.Sid
+JOIN PART P ON SH.PID = P.PID
+WHERE P.Color = 'Green';
+
+4.2SELECT S.Sname, 
+       (SELECT COUNT(*) 
+        FROM SHIPMENT SH 
+        WHERE SH.Sid = S.Sid) AS Total_Parts
+FROM SUPPLIER S;
+
+4.3 UPDATE PART
+SET Color = 'Yellow'
+WHERE PID IN (
+    SELECT PID
+    FROM SHIPMENT
+    WHERE Sid = 3
+);
+
+7.1 SELECT DISTINCT Regno
+FROM PARTICIPATED;
+
+7.2 SELECT Regno, model
+FROM CAR
+WHERE Regno IN (
+    SELECT Regno
+    FROM PARTICIPATED
+    WHERE damage_amount = (SELECT MAX(damage_amount) FROM PARTICIPATED)
+);
+
+7.3 SELECT O.driver_id, COUNT(O.Regno) AS Number_of_Cars
+FROM OWNS O
+GROUP BY O.driver_id;
+
+8.1 SELECT DISTINCT Ground
+FROM MATCH
+WHERE Team1 = 'Australia'
+ORDER BY Ground;
+
+8.2 SELECT M.*
+FROM MATCH M
+WHERE M.MatchId IN (
+    SELECT MatchId
+    FROM BATTING
+    WHERE Pid = (SELECT PId FROM PLAYER WHERE Fname = 'MS' AND Lname = 'Dhoni')
+);
+
+8.3 SELECT P.Fname, P.Lname
+FROM PLAYER P
+WHERE P.PId IN (
+    SELECT Pid
+    FROM BATTING
+    WHERE MatchId = 2689
+);
+
+9.1SELECT Cname 
+FROM CUSTOMER
+WHERE (SELECT COUNT(Ono) FROM ORDER1 WHERE CUSTOMER.Cno = ORDER1.Ocno) > 2;
+
+9.2 SELECT Odate, SUM(Oamt) 
+FROM ORDER1  GROUP BY Odate;
+9.3  SELECT C.Cno, C.Cname, C.Ccity 
+FROM CUSTOMER C
+JOIN ORDER1 O ON C.Cno = O.Ocno
+WHERE O.Oamt = (SELECT MAX(Oamt) FROM ORDER1);
+
+10.1 SELECT C.cname, COUNT(O.order#) AS order_count
+FROM CUSTOMER C, ORDER1 O
+WHERE C.cust# = O.cust# AND C.city = 'Bangalore'
+GROUP BY C.cname;
+
+10.2 SELECT C.cname
+FROM CUSTOMER C, ORDER1 O, ORDER_ITEM OI
+WHERE C.cust# = O.cust# AND O.order# = OI.order#
+GROUP BY C.cname
+HAVING COUNT(OI.item#) >= 3;
+
+10.3 SELECT DISTINCT C.cname
+FROM CUSTOMER C
+WHERE C.cust# NOT IN (
+    SELECT O.cust#
+    FROM ORDER1 O, ORDER_ITEM OI
+    WHERE O.order# = OI.order# AND OI.item# = 10
+);
